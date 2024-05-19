@@ -150,3 +150,5 @@ class DatabaseManager:
         conn.commit()
         cursor.close()
         conn.close()
+
+#τεστ
