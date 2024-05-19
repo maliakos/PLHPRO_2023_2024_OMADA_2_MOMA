@@ -1,2 +1,4 @@
 .venv
 moma.db
+.idea
+/src/__pycache__
