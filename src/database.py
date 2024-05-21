@@ -47,6 +47,7 @@ if not os.path.exists('moma.db'):
 
     # Δημιουργία πίνακα Artworks, ObjectID το PK
     cursor.execute('''CREATE TABLE Artworks(
+                ObjectID TEXT PRIMARY KEY NOT NULL,
                 Title TEXT,
                 Artist TEXT,
                 ConstituentID INT,
@@ -64,7 +65,6 @@ if not os.path.exists('moma.db'):
                 Department TEXT,
                 DateAcquired TEXT,
                 Cataloged TEXT,
-                ObjectID TEXT PRIMARY KEY NOT NULL,
                 URL TEXT,
                 ImageURL TEXT,
                 OnView TEXT,
@@ -77,52 +77,47 @@ if not os.path.exists('moma.db'):
                 Width_cm FLOAT,
                 SeatHeight_cm FLOAT,
                 Duration_sec FLOAT,
-                FOREIGN KEY (Artist) REFERENCES Artists(DisplayName),
-                FOREIGN KEY (ConstituentID) REFERENCES Artists(ConstituentID),
-                FOREIGN KEY (ArtistBio) REFERENCES Artists(ArtistBio),
-                FOREIGN KEY (Nationality) REFERENCES Artists(Nationality),
-                FOREIGN KEY (Gender) REFERENCES Artists(Gender),
-                FOREIGN KEY (BeginDate) REFERENCES Artists(BeginDate),
-                FOREIGN KEY (EndDate) REFERENCES Artists(EndDate) )''')
+                FOREIGN KEY (ConstituentID) REFERENCES Artists(ConstituentID)   )''')
 
     # Εδώ στο json μερικά στοιχεία ήταν σε λίστες :/
     for y in Artworks_data:
-        Title = y.get('Title', None)
-        Artist = ', '.join(y.get('Artist', []))
-        ConstituentID = int(y.get('ConstituentID', [0])[0]) if y.get(
-            'ConstituentID', [0]) else None
-        ArtistBio = ', '.join(y.get('ArtistBio', []))
-        Nationality = ', '.join(y.get('Nationality', []))
-        BeginDate = int(y.get('BeginDate', [0])[0]) if y.get('BeginDate',
-                                                             [0]) else None
-        EndDate = int(y.get('EndDate', [0])[0]) if y.get('EndDate',
-                                                         [0]) else None
-        Gender = ', '.join(y.get('Gender', []))
-        Date = y.get('Date', None)
-        Medium = y.get('Medium', None)
-        Dimensions = y.get('Dimensions', None)
-        CreditLine = y.get('CreditLine', None)
-        AccessionNumber = y.get('AccessionNumber', None)
-        Classification = y.get('Classification', None)
-        Department = y.get('Department', None)
-        DateAcquired = y.get('DateAcquired', None)
-        Cataloged = y.get('Cataloged', None)
-        ObjectID = y.get('ObjectID', None)
-        URL = y.get('URL', None)
-        ImageURL = y.get('ImageURL', None)
-        OnView = y.get('OnView', None)
-        Circumference_cm = y.get('Circumference (cm)', None)
-        Depth_cm = y.get('Depth (cm)', None)
-        Diameter_cm = y.get('Diameter (cm)', None)
-        Height_cm = y.get('Height (cm)', None)
-        Length_cm = y.get('Length (cm)', None)
-        Weight_kg = y.get('Weight (kg)', None)
-        Width_cm = y.get('Width (cm)', None)
-        SeatHeight_cm = y.get('SeatHeight (cm)', None)
-        Duration_sec = y.get('Duration (sec.)', None)
+        if  y.get('ImageURL') is not None:
+            ObjectID = y.get('ObjectID', None)
+            Title = y.get('Title', None)
+            Artist = ', '.join(y.get('Artist', []))
+            ConstituentID = int(y.get('ConstituentID', [0])[0]) if y.get(
+                'ConstituentID', [0]) else None
+            ArtistBio = ', '.join(y.get('ArtistBio', []))
+            Nationality = ', '.join(y.get('Nationality', []))
+            BeginDate = int(y.get('BeginDate', [0])[0]) if y.get('BeginDate',
+                                                                [0]) else None
+            EndDate = int(y.get('EndDate', [0])[0]) if y.get('EndDate',
+                                                            [0]) else None
+            Gender = ', '.join(y.get('Gender', []))
+            Date = y.get('Date', None)
+            Medium = y.get('Medium', None)
+            Dimensions = y.get('Dimensions', None)
+            CreditLine = y.get('CreditLine', None)
+            AccessionNumber = y.get('AccessionNumber', None)
+            Classification = y.get('Classification', None)
+            Department = y.get('Department', None)
+            DateAcquired = y.get('DateAcquired', None)
+            Cataloged = y.get('Cataloged', None)
+            URL = y.get('URL', None)
+            ImageURL = y.get('ImageURL', None)
+            OnView = y.get('OnView', None)
+            Circumference_cm = y.get('Circumference (cm)', None)
+            Depth_cm = y.get('Depth (cm)', None)
+            Diameter_cm = y.get('Diameter (cm)', None)
+            Height_cm = y.get('Height (cm)', None)
+            Length_cm = y.get('Length (cm)', None)
+            Weight_kg = y.get('Weight (kg)', None)
+            Width_cm = y.get('Width (cm)', None)
+            SeatHeight_cm = y.get('SeatHeight (cm)', None)
+            Duration_sec = y.get('Duration (sec.)', None)
 
         # Εισαγωγή στοιχείων στις στήλες του Artworks.
-        cursor.execute('''INSERT INTO Artworks (Title, Artist, ConstituentID, ArtistBio, Nationality, BeginDate, EndDate, Gender, Date, Medium, Dimensions, CreditLine, AccessionNumber, Classification, Department, DateAcquired, Cataloged, ObjectID, URL, ImageURL, OnView, Circumference_cm, Depth_cm, Diameter_cm, Height_cm, Length_cm, Weight_kg, Width_cm, SeatHeight_cm, Duration_sec)
+            cursor.execute('''INSERT INTO Artworks (Title, Artist, ConstituentID, ArtistBio, Nationality, BeginDate, EndDate, Gender, Date, Medium, Dimensions, CreditLine, AccessionNumber, Classification, Department, DateAcquired, Cataloged, ObjectID, URL, ImageURL, OnView, Circumference_cm, Depth_cm, Diameter_cm, Height_cm, Length_cm, Weight_kg, Width_cm, SeatHeight_cm, Duration_sec)
                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                        (Title, Artist, ConstituentID, ArtistBio, Nationality,
                         BeginDate, EndDate, Gender, Date, Medium, Dimensions,
@@ -131,6 +126,10 @@ if not os.path.exists('moma.db'):
                         OnView, Circumference_cm, Depth_cm, Diameter_cm,
                         Height_cm, Length_cm, Weight_kg, Width_cm,
                         SeatHeight_cm, Duration_sec))
+
+
+    cursor.execute("DELETE FROM Artists WHERE ConstituentID NOT IN (SELECT ConstituentID FROM Artworks)")
+
 
     conn.commit()
 
