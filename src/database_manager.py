@@ -93,7 +93,7 @@ class DatabaseManager:
 
         # Εδώ στο json μερικά στοιχεία ήταν σε λίστες :/
         for y in Artworks_data:
-            if  y.get('ImageURL') is not None:
+            if  y.get('Department') == 'Painting & Sculpture' or y.get('Department') == 'Media and Performance':
                 ObjectID = y.get('ObjectID', None)
                 Title = y.get('Title', None)
                 Artist = ', '.join(y.get('Artist', []))
@@ -140,7 +140,7 @@ class DatabaseManager:
                             SeatHeight_cm, Duration_sec))
 
 
-        cursor.execute("DELETE FROM Artists WHERE ConstituentID NOT IN (SELECT ConstituentID FROM Artworks)")
+        cursor.execute("DELETE FROM Artists WHERE NOT EXISTS (SELECT ConstituentID FROM Artworks WHERE Artworks.ConstituentID = Artists.ConstituentID)")
 
 
         conn.commit()
