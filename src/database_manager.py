@@ -27,35 +27,7 @@ class DatabaseManager:
         with open('Artworks.json', 'r', encoding='utf-8') as f:
             Artworks_data = json.load(f)
 
-        # Δημιουργία πίνακα Artists, PK το ConstituentID
-        cursor.execute('''CREATE TABLE Artists(
-                    ConstituentID INT PRIMARY KEY NOT NULL,
-                    DisplayName TEXT,
-                    ArtistBio TEXT,
-                    Nationality TEXT,
-                    Gender TEXT,
-                    BeginDate INT,
-                    EndDate INT,
-                    "Wiki QID" TEXT,
-                    ULAN INT)   ''')
-
-        for x in Artists_data:
-            # Μερικές τιμές είναι NULL οπότε ελέγχω την ύπαρξη ή μη πριν την εισαγωγή
-            ConstituentID = x.get('ConstituentID', None)
-            DisplayName = x.get('DisplayName', None)
-            ArtistBio = x.get('ArtistBio', None)
-            Nationality = x.get('Nationality', None)
-            Gender = x.get('Gender', None)
-            BeginDate = x.get('BeginDate', None)
-            EndDate = x.get('EndDate', None)
-            Wiki_QID = x.get('Wiki QID', None)
-            ULAN = x.get('ULAN', None)
-
-            # Εισαγωγή στοιχείων στις στήλες του Artists.
-            cursor.execute(''' INSERT INTO Artists (ConstituentID, DisplayName, ArtistBio, Nationality, Gender, BeginDate, EndDate, "Wiki QID", ULAN )
-                        VALUES (?,?,?,?,?,?,?,?,?)''', (
-            ConstituentID, DisplayName, ArtistBio, Nationality, Gender, BeginDate,
-            EndDate, Wiki_QID, ULAN))
+        
 
         # Δημιουργία πίνακα Artworks, ObjectID το PK
         cursor.execute('''CREATE TABLE Artworks(
@@ -88,8 +60,7 @@ class DatabaseManager:
                     Weight_kg FLOAT,
                     Width_cm FLOAT,
                     SeatHeight_cm FLOAT,
-                    Duration_sec FLOAT,
-                    FOREIGN KEY (ConstituentID) REFERENCES Artists(ConstituentID)   )''')
+                    Duration_sec FLOAT)''')
 
         # Εδώ στο json μερικά στοιχεία ήταν σε λίστες :/
         for y in Artworks_data:
@@ -139,8 +110,39 @@ class DatabaseManager:
                             Height_cm, Length_cm, Weight_kg, Width_cm,
                             SeatHeight_cm, Duration_sec))
 
+        # Δημιουργία πίνακα Artists, PK το ConstituentID
+        cursor.execute('''CREATE TABLE Artists(
+                    ConstituentID INT PRIMARY KEY NOT NULL,
+                    DisplayName TEXT,
+                    ArtistBio TEXT,
+                    Nationality TEXT,
+                    Gender TEXT,
+                    BeginDate INT,
+                    EndDate INT,
+                    "Wiki QID" TEXT,
+                    ULAN INT,
+                    FOREIGN KEY (ConstituentID) REFERENCES Artworks(ConstituentID))   ''')
 
-        cursor.execute("DELETE FROM Artists WHERE NOT EXISTS (SELECT ConstituentID FROM Artworks WHERE Artworks.ConstituentID = Artists.ConstituentID)")
+        for x in Artists_data:
+            # Μερικές τιμές είναι NULL οπότε ελέγχω την ύπαρξη ή μη πριν την εισαγωγή
+            ConstituentID = x.get('ConstituentID', None)
+            cursor.execute('SELECT COUNT(*) FROM Artworks WHERE ConstituentID = ?', (ConstituentID,))
+            count = cursor.fetchone()[0]
+            if count > 0:
+                DisplayName = x.get('DisplayName', None)
+                ArtistBio = x.get('ArtistBio', None)
+                Nationality = x.get('Nationality', None)
+                Gender = x.get('Gender', None)
+                BeginDate = x.get('BeginDate', None)
+                EndDate = x.get('EndDate', None)
+                Wiki_QID = x.get('Wiki QID', None)
+                ULAN = x.get('ULAN', None)
+
+                # Εισαγωγή στοιχείων στις στήλες του Artists.
+                cursor.execute(''' INSERT INTO Artists (ConstituentID, DisplayName, ArtistBio, Nationality, Gender, BeginDate, EndDate, "Wiki QID", ULAN )
+                            VALUES (?,?,?,?,?,?,?,?,?)''', (
+                ConstituentID, DisplayName, ArtistBio, Nationality, Gender, BeginDate,
+                EndDate, Wiki_QID, ULAN))
 
 
         conn.commit()
