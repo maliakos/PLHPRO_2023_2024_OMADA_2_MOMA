@@ -2,7 +2,6 @@ import customtkinter as ctk
 from search import SearchWindow
 from database_manager import DatabaseManager
 from PIL import Image as myImage, ImageTk
-from tkinter import *
 
 class StylingOptions:
     '''Αφορά τις βασικές ρυθμίσεις εμφάνισης'''
