@@ -12,10 +12,10 @@ class DatabaseManager:
             except sqlite3.Error as e:
                 print(f"Error creating Database:{e}")
 
-        self.connection = sqlite3.connect('moma.db')
-
     #Μέθοδος για σύνδεση με τη ΒΔ
     def get_connection(self):
+        self.connection = sqlite3.connect('moma.db')
+
         return self.connection
 
     
@@ -23,7 +23,7 @@ class DatabaseManager:
         #Δημιουργία της ΒΔ
         conn = sqlite3.connect('moma.db')
         cursor = conn.cursor()
-
+        self.IDs = []
         self.create_artworks(cursor)
         self.create_artists(cursor)
 
@@ -106,7 +106,11 @@ class DatabaseManager:
                     ObjectID = y.get('ObjectID', None)
                     Title = y.get('Title', None)
                     Artist = ', '.join(y.get('Artist', []))
-                    ConstituentID = int(y.get('ConstituentID', [0])[0]) if y.get('ConstituentID', [0]) else None
+                    if y.get('ConstituentID', [0]):
+                        ConstituentID = int(y.get('ConstituentID', [0])[0]) 
+                        self.ID_Search(ConstituentID)
+                    else: 
+                        ConstituentID = None
                     ArtistBio = ', '.join(y.get('ArtistBio', []))
                     Nationality = ', '.join(y.get('Nationality', []))
                     BeginDate = int(y.get('BeginDate', [0])[0]) if y.get('BeginDate', [0]) else None
@@ -148,15 +152,16 @@ class DatabaseManager:
                     print(f"Error inserting Artwork: {e}")
     
     def insert_artists(self, cursor, Artists_data):
+
+        
         for x in Artists_data:
             #Εισαγωγή δεδομένων στον πίνακα Artists
             #Έλεγχος αν το ID υπάρχει σε κάποιο έργο στον Artworks, προκειμένου να υπάρχουν στον πίνακα μόνο καλλιτέχνες με έργα στη ΜοΜΑ
             try:
                 ConstituentID = x.get('ConstituentID', None)
-                cursor.execute('SELECT COUNT(*) FROM Artworks WHERE ConstituentID = ?', (ConstituentID,))
-                count = cursor.fetchone()[0]
                 
-                if count > 0:
+                
+                if ConstituentID in self.IDs:
                     DisplayName = x.get('DisplayName', None)
                     ArtistBio = x.get('ArtistBio', None)
                     Nationality = x.get('Nationality', None)
@@ -174,3 +179,6 @@ class DatabaseManager:
 
             except sqlite3.Error as e:
                 print(f"Error inserting Artist:{e}")
+
+    def ID_Search(self, ConstituentID):
+        self.IDs.append(ConstituentID)
