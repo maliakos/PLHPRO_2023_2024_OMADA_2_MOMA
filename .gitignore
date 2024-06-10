@@ -2,3 +2,4 @@
 moma.db
 .idea
 /src/__pycache__
+/src/*.json
