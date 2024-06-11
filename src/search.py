@@ -84,8 +84,8 @@ class SearchWindow:
 
         self.artworks_tab = filters_tabs.add("Artworks")
         self.artworks_data = self.search('Artworks')
-        artworks_data, artworks_headers, self.total_count = self.artworks_data
-        self.total_pages = len(artworks_data) // self.items_per_page
+        artworks_data, artworks_headers, total_count = self.artworks_data
+        self.total_count = total_count
         artworks_filters_frame = ctk.CTkFrame(self.artworks_tab, fg_color=self.app.MOMA_BG_SECONDARY)
         artworks_filters_frame.place(relwidth=0.2, relheight=1)
         self.draw_artwork_sidebar(artworks_filters_frame)
@@ -106,7 +106,12 @@ class SearchWindow:
 
     def refresh_artworks_table(self):
         self.artworks_data = self.search('Artworks')
-        artworks_data, artworks_headers, self.total_count = self.artworks_data
+        artworks_data, artworks_headers, total_count = self.artworks_data
+        # Set the current page to 0 if the total count has changed e.g. only when searching and not when changing pages
+        if self.total_count != total_count:
+            self.current_page = 0
+        self.total_count = 0
+        self.total_count = total_count
         self.artworks_table_frame.destroy()
         self.artworks_table_frame = ctk.CTkFrame(self.artworks_tab)
         self.artworks_table_frame.place(relx=0.2, relwidth=0.8, relheight=1)
@@ -114,8 +119,10 @@ class SearchWindow:
         page_label = ctk.CTkLabel(self.artworks_tab, text=f"Page {self.current_page + 1}/{self.total_pages}", font=self.app.MOMA_FONT_MD)
         page_label.place(relx=0.5, rely=0.95, anchor=ctk.CENTER)
 
+    @property
     def total_pages(self):
-        return math.ceil(self.total_count / self.items_per_page)
+        total_count = math.ceil(self.total_count / self.items_per_page)
+        return total_count
 
     def draw_artwork_sidebar(self, sidebar_frame):
         # Create the search filters for the Artworks tab based on the filter valionary
@@ -135,7 +142,7 @@ class SearchWindow:
         search_button = ctk.CTkButton(sidebar_frame, text="Search", command=self.refresh_artworks_table, font=self.app.MOMA_FONT_MD)
         search_button.pack(pady=(30, 0))
         # Create a clear button
-        clear_button = ctk.CTkButton(sidebar_frame, text="Clear", command=self.clear_filters, font=self.app.MOMA_FONT_MD)
+        clear_button = ctk.CTkButton(sidebar_frame, text="Clear", command=self.clear, font=self.app.MOMA_FONT_MD)
         clear_button.pack(pady=(10, 0))
 
         pagination_frame = ctk.CTkFrame(sidebar_frame)
@@ -155,11 +162,13 @@ class SearchWindow:
                                     hover_color='#fff', fg_color='#fff', image=next_image, command=self.next_page)
         next_button.pack(side=ctk.LEFT)
 
-    def clear_filters(self):
+    def clear(self):
         for key, val in self.filters.items():
             if val['value'] is not None:
                 self.filters[key]['value'].set('')
         self.refresh_artworks_table()
+        self.total_count = 0
+        self.current_page = 0
 
     def handle_gender_change(self, value):
         self.filters['Gender']['value'] = value
@@ -180,7 +189,7 @@ class SearchWindow:
         self.refresh_artworks_table()
 
     def next_page(self):
-        if self.current_page < self.total_pages:
+        if (self.current_page + 1) < self.total_pages:
             self.current_page += 1
             self.refresh_artworks_table()
 
