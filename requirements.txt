@@ -1,5 +1,10 @@
+certifi==2024.6.2
+charset-normalizer==3.3.2
 customtkinter==5.2.2
 darkdetect==0.8.0
+idna==3.7
 packaging==24.0
 pillow==10.3.0
+requests==2.32.3
 tksheet==7.2.9
+urllib3==2.2.1
