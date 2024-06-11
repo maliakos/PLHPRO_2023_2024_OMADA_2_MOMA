@@ -149,7 +149,7 @@ class Main_page_UI:
 
     def draw_home_button(self):
         
-        self.home_image = myImage.open("Home_Icon.png")
+        self.home_image = myImage.open("../assets/Home_Icon.png")
         self.resized_image = self.home_image.resize((35, 35))
         self.home_tn = ctk.CTkImage(self.resized_image)
         
