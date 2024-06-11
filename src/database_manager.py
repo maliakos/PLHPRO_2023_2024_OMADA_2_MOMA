@@ -41,12 +41,7 @@ class DatabaseManager:
                     ObjectID TEXT PRIMARY KEY NOT NULL,
                     Title TEXT,
                     Artist TEXT,
-                    ConstituentID INT,
-                    ArtistBio TEXT,
-                    Nationality TEXT,
-                    BeginDate INT,
-                    EndDate INT,
-                    Gender TEXT,
+                    ConstituentID TEXT,
                     Date TEXT,
                     Medium TEXT,
                     Dimensions TEXT,
@@ -72,7 +67,7 @@ class DatabaseManager:
     def create_artists(self, cursor):
         # Δημιουργία πίνακα Artists, PK το ConstituentID
         cursor.execute('''CREATE TABLE Artists(
-                    ConstituentID INT PRIMARY KEY NOT NULL,
+                    ConstituentID TEXT PRIMARY KEY NOT NULL,
                     DisplayName TEXT,
                     ArtistBio TEXT,
                     Nationality TEXT,
@@ -106,16 +101,14 @@ class DatabaseManager:
                     ObjectID = y.get('ObjectID', None)
                     Title = y.get('Title', None)
                     Artist = ', '.join(y.get('Artist', []))
-                    if y.get('ConstituentID', [0]):
-                        ConstituentID = int(y.get('ConstituentID', [0])[0]) 
-                        self.ID_Search(ConstituentID)
-                    else: 
-                        ConstituentID = None
-                    ArtistBio = ', '.join(y.get('ArtistBio', []))
-                    Nationality = ', '.join(y.get('Nationality', []))
-                    BeginDate = int(y.get('BeginDate', [0])[0]) if y.get('BeginDate', [0]) else None
-                    EndDate = int(y.get('EndDate', [0])[0]) if y.get('EndDate', [0]) else None
-                    Gender = ', '.join(y.get('Gender', []))
+
+                    ConstituentID_list = y.get('ConstituentID', [])
+                    ConstituentID = ','.join(map(str, ConstituentID_list))
+                
+                    for id in ConstituentID_list:
+                        self.ID_Search(id)
+
+                    
                     Date = y.get('Date', None)
                     Medium = y.get('Medium', None)
                     Dimensions = y.get('Dimensions', None)
@@ -139,10 +132,10 @@ class DatabaseManager:
                     Duration_sec = y.get('Duration (sec.)', None)
 
                 # Εισαγωγή στοιχείων στις στήλες του Artworks.
-                    cursor.execute('''INSERT INTO Artworks (Title, Artist, ConstituentID, ArtistBio, Nationality, BeginDate, EndDate, Gender, Date, Medium, Dimensions, CreditLine, AccessionNumber, Classification, Department, DateAcquired, Cataloged, ObjectID, URL, ImageURL, OnView, Circumference_cm, Depth_cm, Diameter_cm, Height_cm, Length_cm, Weight_kg, Width_cm, SeatHeight_cm, Duration_sec)
-                            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-                            (Title, Artist, ConstituentID, ArtistBio, Nationality,
-                                BeginDate, EndDate, Gender, Date, Medium, Dimensions,
+                    cursor.execute('''INSERT INTO Artworks (Title, Artist, ConstituentID, Date, Medium, Dimensions, CreditLine, AccessionNumber, Classification, Department, DateAcquired, Cataloged, ObjectID, URL, ImageURL, OnView, Circumference_cm, Depth_cm, Diameter_cm, Height_cm, Length_cm, Weight_kg, Width_cm, SeatHeight_cm, Duration_sec)
+                            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                            (Title, Artist, ConstituentID, 
+                                Date, Medium, Dimensions,
                                 CreditLine, AccessionNumber, Classification, Department,
                                 DateAcquired, Cataloged, ObjectID, URL, ImageURL,
                                 OnView, Circumference_cm, Depth_cm, Diameter_cm,

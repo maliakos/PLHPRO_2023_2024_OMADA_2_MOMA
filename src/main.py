@@ -19,6 +19,7 @@ class StylingOptions:
         ctk.set_default_color_theme("dark-blue")
 
         self.master.geometry("1000x800")
+        self.master.title("MoMA Database")
 
         self.master.MOMA_FONT_XLG = ("Helvetica", 60)
         self.master.MOMA_FONT_LG = ("Helvetica", 45)
@@ -33,7 +34,7 @@ class StylingOptions:
     def setup_bg_image(self):
         '''Διαχειρίζεται την εικόνα στο background'''
         try:
-            ImageInBackground(self.master, 'moma_photo.jpg')
+            ImageInBackground(self.master, '../assets/moma_photo.jpg')
             
         except Exception as e:
             print("An error occurred during background image resize:", e)
@@ -145,7 +146,7 @@ class Main_page_UI:
 
     def draw_home_button(self):
         
-        self.home_image = myImage.open("Home_Icon.png")
+        self.home_image = myImage.open("../assets/Home_Icon.png")
         self.resized_image = self.home_image.resize((35, 35))
         self.home_tn = ctk.CTkImage(self.resized_image)
         
@@ -188,6 +189,7 @@ class Main_Class:
         DatabaseManager()
         
         Main_page_UI(master)
+
 
         
 
