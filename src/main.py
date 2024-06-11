@@ -37,7 +37,7 @@ class StylingOptions:
     def setup_bg_image(self):
         '''Διαχειρίζεται την εικόνα στο background'''
         try:
-            ImageInBackground(self.master, 'moma_photo.jpg')
+            ImageInBackground(self.master, '../assets/moma_photo.jpg')
             
         except Exception as e:
             print("An error occurred during background image resize:", e)
