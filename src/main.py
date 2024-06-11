@@ -18,7 +18,11 @@ class StylingOptions:
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("dark-blue")
 
-        self.master.geometry("1000x800")
+        #Full screen
+        width = self.master.winfo_screenwidth()
+        height = self.master.winfo_screenheight()
+
+        self.master.geometry(f"{width}x{height}")
 
         self.master.MOMA_FONT_XLG = ("Helvetica", 60)
         self.master.MOMA_FONT_LG = ("Helvetica", 45)
@@ -33,7 +37,7 @@ class StylingOptions:
     def setup_bg_image(self):
         '''Διαχειρίζεται την εικόνα στο background'''
         try:
-            ImageInBackground(self.master, 'moma_photo.jpg')
+            ImageInBackground(self.master, '../assets/moma_photo.jpg')
             
         except Exception as e:
             print("An error occurred during background image resize:", e)
