@@ -20,6 +20,11 @@ class StylingOptions:
 
         self.master.geometry("1000x800")
         self.master.title("MoMA Database")
+        #Full screen
+        width = self.master.winfo_screenwidth()
+        height = self.master.winfo_screenheight()
+
+        self.master.geometry(f"{width}x{height}")
 
         self.master.MOMA_FONT_XLG = ("Helvetica", 60)
         self.master.MOMA_FONT_LG = ("Helvetica", 45)
