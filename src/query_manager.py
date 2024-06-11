@@ -9,26 +9,38 @@ class QueryManager:
         self.connection = connection
         self.cursor = connection.cursor()
 
-    def execute_query(self, query, params):
+    def execute_query(self, query):
         try:
-            self.cursor.execute(query, params)
+            self.cursor.execute(query)
             return self.cursor.fetchall()
         except sqlite3.Error as e:
-            print(f"An error occurred: {e}")
+            print(f"An database related error occurred: {e}")
             return None
 
-    def get_all(self, table_name, columns):
-
-      if columns.length == 0:
-            columns_str = '*'
-      else:
-            columns_str = ', '.join(columns)
-      return self.execute_query(f'SELECT ? FROM {table_name}', columns)
-
-    def get_distinct(self, table_name, column_name):
+    def get_distinct_options(self, table_name, column_name):
         result = self.execute_query(f'SELECT DISTINCT {column_name} FROM {table_name} '
-                                    f'WHERE {column_name} IS NOT NULL', ())
+                                    f'WHERE {column_name} IS NOT NULL')
         return [row[0] for row in result]
 
-    def get_custom(self, query):
-        return self.execute_query(query, None)
+    def get_search_query(self, table, constraints, limit=25, offset=0):
+        query = f"SELECT * FROM {table}"
+        if constraints:
+            query += " WHERE " + " AND ".join(constraints)
+        # Use -1 to get all results
+        if limit != -1:
+            query += f" LIMIT {limit} OFFSET {offset}"
+
+        data = self.execute_query(query)
+        if not data:
+            data = []
+            headers = []
+            count = 0
+        else:
+            headers = [column[0] for column in self.cursor.description]
+            count_query = f"SELECT COUNT(*) FROM {table}"
+            if constraints:
+                count_query += " WHERE " + " AND ".join(constraints)
+            count = self.execute_query(count_query)[0][0]
+
+        self.connection.cursor().close()
+        return [data, headers, count]

@@ -18,7 +18,11 @@ class StylingOptions:
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("dark-blue")
 
-        self.master.geometry("1000x800")
+        #Full screen
+        width = self.master.winfo_screenwidth()
+        height = self.master.winfo_screenheight()
+
+        self.master.geometry(f"{width}x{height}")
 
         self.master.MOMA_FONT_XLG = ("Helvetica", 60)
         self.master.MOMA_FONT_LG = ("Helvetica", 45)
