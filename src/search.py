@@ -152,8 +152,8 @@ class SearchWindow:
         next_image = Image.open("../assets/next_icon.png").resize((60, 60))
         prev_image = Image.open("../assets/previous_icon.png").resize((60, 60))
         # Convert the images to CTkImage
-        next_image = ctk.CTkImage(next_image)
-        prev_image = ctk.CTkImage(prev_image)
+        next_image = ctk.CTkImage(light_image=next_image, dark_image=next_image, size=(60, 60))
+        prev_image = ctk.CTkImage(light_image=prev_image, dark_image=prev_image, size=(60, 60))
 
         prev_button = ctk.CTkButton(pagination_frame, text='', width=75, height=75, hover_color='#fff',
                                     fg_color='#fff', image=prev_image, command=self.previous_page)
