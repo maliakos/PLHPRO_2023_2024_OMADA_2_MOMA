@@ -146,7 +146,7 @@ class SearchWindow:
             elif val['type'] == 'dropdown':
                 options = ['', 'male', 'female', 'unknown', 'non-binary', 'other', 'transgender', 'trans']
                 dropdown = ctk.CTkOptionMenu(master=sidebar_frame, values=options, command=self.handle_gender_change,
-                                             font=self.app.MOMA_FONT_MD)
+                                             font=self.app.MOMA_FONT_MD,dropdown_font=self.app.MOMA_FONT_MD)
                 dropdown.pack(pady=(10, 10))
         self.draw_dimensions_filters(sidebar_frame)
         # Create a search button
