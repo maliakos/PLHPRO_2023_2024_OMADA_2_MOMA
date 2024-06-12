@@ -1,7 +1,9 @@
 import customtkinter as ctk
+from tkinter import StringVar
 from query_manager import QueryManager
 from datagrid import DataGrid
 from PIL import Image
+from CTkToolTip import CTkToolTip
 import math
 
 
@@ -9,46 +11,54 @@ class SearchWindow:
     def __init__(self, app, conn):
         # Intance helpers
         self.app = app
+        self.dimension_filters = {
+            'min_height': StringVar(),
+            'max_height': StringVar(),
+            'min_width': StringVar(),
+            'max_width': StringVar(),
+        }
         self.filters = {
             'Title': {
                 'type': 'text',
                 'label': 'Title',
-                'value': None
+                'value': StringVar(),
+                'table': 'Artworks',
             },
             'Artist': {
                 'type': 'text',
                 'label': 'Artist',
-                'value': None
+                'value': StringVar(),
+                'table': 'Artworks',
             },
             'Nationality': {
                 'type': 'text',
-                'label': 'Country',
-                'value': None
+                'label': 'Nationality',
+                'value': StringVar(),
+                'table': 'Artists',
             },
             'Gender': {
                 'type': 'dropdown',
                 'label': 'Gender',
-                'value': None,
-            },
-            'Dimensions': {
-                'type': 'text',
-                'label': 'Dimensions',
-                'value': None
+                'value': StringVar(),
+                'table': 'Artists',
             },
             'Date': {
                 'type': 'text',
                 'label': 'Year of Creation',
-                'value': None
+                'value': StringVar(),
+                'table': 'Artworks',
             },
             'DateAcquired': {
                 'type': 'text',
                 'label': 'Year of Acquisition',
-                'value': None
+                'value': StringVar(),
+                'table': 'Artworks',
             },
             'Medium': {
                 'type': 'text',
                 'label': 'Medium',
-                'value': None
+                'value': StringVar(),
+                'table': 'Artworks',
             },
         }
         self.query_manager = QueryManager(conn)
@@ -86,7 +96,7 @@ class SearchWindow:
         self.artworks_data = self.search('Artworks')
         artworks_data, artworks_headers, total_count = self.artworks_data
         self.total_count = total_count
-        artworks_filters_frame = ctk.CTkFrame(self.artworks_tab, fg_color=self.app.MOMA_BG_SECONDARY)
+        artworks_filters_frame = ctk.CTkScrollableFrame(self.artworks_tab, fg_color=self.app.MOMA_BG_SECONDARY)
         artworks_filters_frame.place(relwidth=0.2, relheight=1)
         self.draw_artwork_sidebar(artworks_filters_frame)
         # We need a reference to the following to use when refreshing the table.
@@ -125,25 +135,26 @@ class SearchWindow:
         return total_count
 
     def draw_artwork_sidebar(self, sidebar_frame):
-        # Create the search filters for the Artworks tab based on the filter valionary
+        # Create the search filters for the Artworks tab based on the filter dictionary
         for key, val in self.filters.items():
             label = ctk.CTkLabel(sidebar_frame, text=val['label'], font=self.app.MOMA_FONT_MD)
-            label.pack(pady=(10, 0))
+            label.pack(pady=(10, 10))
             if val['type'] == 'text':
                 self.filters[key]['value'] = ctk.StringVar()
                 entry = ctk.CTkEntry(sidebar_frame, textvariable=self.filters[key]['value'], font=self.app.MOMA_FONT_MD)
-                entry.pack(pady=(10, 0))
+                entry.pack(pady=(10, 10))
             elif val['type'] == 'dropdown':
                 options = ['', 'male', 'female', 'unknown', 'non-binary', 'other', 'transgender', 'trans']
                 dropdown = ctk.CTkOptionMenu(master=sidebar_frame, values=options, command=self.handle_gender_change,
                                              font=self.app.MOMA_FONT_MD)
-                dropdown.pack(pady=(10, 0))
+                dropdown.pack(pady=(10, 10))
+        self.draw_dimensions_filters(sidebar_frame)
         # Create a search button
         search_button = ctk.CTkButton(sidebar_frame, text="Search", command=self.refresh_artworks_table, font=self.app.MOMA_FONT_MD)
-        search_button.pack(pady=(30, 0))
+        search_button.pack(pady=(50, 10))
         # Create a clear button
         clear_button = ctk.CTkButton(sidebar_frame, text="Clear", command=self.clear, font=self.app.MOMA_FONT_MD)
-        clear_button.pack(pady=(10, 0))
+        clear_button.pack(pady=(10, 10))
 
         pagination_frame = ctk.CTkFrame(sidebar_frame)
         pagination_frame.pack(pady=(30, 0))
@@ -162,10 +173,65 @@ class SearchWindow:
                                     hover_color='#fff', fg_color='#fff', image=next_image, command=self.next_page)
         next_button.pack(side=ctk.LEFT)
 
+    def draw_dimensions_filters(self, sidebar_frame):
+        dimensions = self.query_manager.get_max_min_dimensions_in_cm()
+        if dimensions is None or dimensions[0] is None:
+            return
+        dim = {
+            'min_height': int(dimensions[0]) if dimensions[0] is not None else None,
+            'max_height': int(dimensions[1]) if dimensions[1] is not None else None,
+            'min_width': int(dimensions[2]) if dimensions[2] is not None else None,
+            'max_width': int(dimensions[3]) if dimensions[3] is not None else None
+        }
+        # Min height
+        min_height_label = ctk.CTkLabel(sidebar_frame,
+                                        text="Min Height",
+                                        font=self.app.MOMA_FONT_MD)
+        min_height_label.pack(pady=(10, 10))
+        CTkToolTip(min_height_label, font=self.app.MOMA_FONT_MD, bg_color='black',
+                   message=f"({dim['min_height']} to {dim['max_height'] - 1} cm)")
+        min_height_entry = ctk.CTkEntry(sidebar_frame, font=self.app.MOMA_FONT_MD,
+                                        textvariable=self.dimension_filters['min_height'])
+        min_height_entry.pack(pady=(10, 10))
+        # max height
+        max_height_label = ctk.CTkLabel(sidebar_frame,
+                                        text="Max Height",
+                                        font=self.app.MOMA_FONT_MD)
+        max_height_label.pack(pady=(10, 10))
+        CTkToolTip(max_height_label, font=self.app.MOMA_FONT_MD, bg_color='black',
+                   message=f"({dim['min_height'] + 1} to {dim['max_height']} cm)")
+        max_height_entry = ctk.CTkEntry(sidebar_frame, font=self.app.MOMA_FONT_MD,
+                                        textvariable=self.dimension_filters['max_height'])
+        max_height_entry.pack(pady=(10, 10))
+        # min width
+        min_width_label = ctk.CTkLabel(sidebar_frame,
+                                       text="Min Width",
+                                       font=self.app.MOMA_FONT_MD)
+        min_width_label.pack(pady=(10, 10))
+        CTkToolTip(min_width_label, font=self.app.MOMA_FONT_MD, bg_color='black',
+                   message=f"({dim['min_width']} to {dim['max_width'] - 1} cm)")
+
+
+        min_width_entry = ctk.CTkEntry(sidebar_frame, font=self.app.MOMA_FONT_MD,
+                                       textvariable=self.dimension_filters['min_width'])
+        min_width_entry.pack(pady=(10, 10))
+        # max width
+        max_width_label = ctk.CTkLabel(sidebar_frame,
+                                       text="Max Width",
+                                       font=self.app.MOMA_FONT_MD)
+        max_width_label.pack(pady=(10, 10))
+        CTkToolTip(max_width_label, font=self.app.MOMA_FONT_MD, bg_color='black',
+                   message=f"({dim['min_width'] + 1} to {dim['max_width']} cm)")
+        max_width_entry = ctk.CTkEntry(sidebar_frame, font=self.app.MOMA_FONT_MD,
+                                       textvariable=self.dimension_filters['max_width'])
+        max_width_entry.pack(pady=(10, 10))
+
     def clear(self):
         for key, val in self.filters.items():
-            if val['value'] is not None:
+            if val['value'] is not None and isinstance(val['value'], StringVar):
                 self.filters[key]['value'].set('')
+            elif val['value'] is not None and isinstance(val['value'], str):
+                self.filters[key]['value'] = ''
         self.refresh_artworks_table()
         self.total_count = 0
         self.current_page = 0
@@ -176,11 +242,28 @@ class SearchWindow:
     def build_query_constraints(self):
         constraints = []
         for key, val in self.filters.items():
-            if val['value'] is not None and val['value'].get() != '':
+            actual_value = val['value']
+            if (actual_value is not None and
+                    (isinstance(actual_value, StringVar) and val['value'].get() != '') or
+                    (isinstance(actual_value, str) and val['value'] != '')):
                 if val['type'] == 'text':
-                    constraints.append(f"{key} LIKE '%{val['value'].get()}%'")
+                    constraints.append(f"{val['table']}.{key} LIKE '%{val['value'].get()}%'")
                 elif val['type'] == 'dropdown':
                     constraints.append(f"{key} = '{val['value']}'")
+        for key, val in self.dimension_filters.items():
+            if val is not None and val.get() != '':
+                if key == 'min_height' and self.dimension_filters['max_height'].get() != '':
+                    constraints.append(f"Height_cm BETWEEN {val.get()} AND {self.dimension_filters['max_height'].get()}")
+                elif key == 'min_height':
+                    constraints.append(f"Height_cm >= {val.get()}")
+                elif key == 'max_height':
+                    constraints.append(f"Height_cm <= {val.get()}")
+                elif key == 'min_width' and self.dimension_filters['max_width'].get() != '':
+                    constraints.append(f"Width_cm BETWEEN {val.get()} AND {self.dimension_filters['max_width'].get()}")
+                elif key == 'min_width':
+                    constraints.append(f"Width_cm >= {val.get()}")
+                elif key == 'max_width':
+                    constraints.append(f"Width_cm <= {val.get()}")
         return constraints
 
     def previous_page(self):

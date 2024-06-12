@@ -1,5 +1,6 @@
 certifi==2024.6.2
 charset-normalizer==3.3.2
+CTkToolTip==0.8
 customtkinter==5.2.2
 darkdetect==0.8.0
 idna==3.7

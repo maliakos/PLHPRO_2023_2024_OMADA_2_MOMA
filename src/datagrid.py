@@ -20,10 +20,15 @@ class DataGrid:
 
     # This method creates the data grid and mounts it on the frame/window
     def draw_table(self):
+
+        #Do not display the ImageURL and , URL columns
+        displayed_headers = [header for header in self.headers if header not in ['ImageURL', 'URL']]
+        displayed_data = [[data for i, data in enumerate(row) if self.headers[i] not in ['ImageURL', 'URL']] for row in self.data]
+
         # Create the data grid
         self.sheet = Sheet(self.master,
-                           data=self.data,
-                           headers=self.headers,
+                           data=displayed_data,
+                           headers=displayed_headers,
                            width=1600,
                            height=800,
                            theme='dark blue',
@@ -32,10 +37,10 @@ class DataGrid:
                            auto_resize_columns=250
                            )
         self.sheet.enable_bindings()
-        self.sheet.highlight_cells(row="all", column=0, bg="#007BFF",
+        self.sheet.highlight_cells(row="all", column=0, bg="#6c757d",
                                        fg="#FFFFFF")
         self.sheet.extra_bindings([("cell_select", self.handle_button_click)])
-        self.sheet.set_all_cell_sizes_to_text(True, 150)
+        self.sheet.set_all_cell_sizes_to_text(True, 350)
         self.sheet.pack(fill='both', expand=True)
 
     def handle_button_click(self, _):
