@@ -1,6 +1,5 @@
 from tksheet import Sheet
 from artwork_details import PopUpWindow
-from customtkinter import CTkLabel
 
 
 # This class is not a window, its role is to create a data grid and mount it on the frame/window
@@ -23,7 +22,7 @@ class DataGrid:
     # This method creates the data grid and mounts it on the frame/window
     def draw_table(self):
 
-        #Do not display the ImageURL and , URL columns
+        # Do not display the ImageURL and , URL columns
         displayed_headers = [header for header in self.headers if header not in ['ImageURL', 'URL']]
         displayed_data = [[data for i, data in enumerate(row) if self.headers[i] not in ['ImageURL', 'URL']] for row in self.data]
 
