@@ -44,7 +44,6 @@ class QueryManager:
         if limit != -1:
             query += f" LIMIT {limit} OFFSET {offset}"
         data = self.execute_query(query)
-        print('main_query', query)
         if not data:
             data = []
             headers = []
