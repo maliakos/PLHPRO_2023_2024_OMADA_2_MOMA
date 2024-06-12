@@ -34,7 +34,7 @@ class QueryManager:
         return result[0]
 
     def get_search_query(self, table, constraints, limit=25, offset=0):
-        query = f"SELECT * FROM {table}"
+        query = f"SELECT {table}.* FROM {table}"
         if table == "Artworks":
             query += " LEFT JOIN Artists ON Artworks.ConstituentID = Artists.ConstituentID"
 

@@ -103,7 +103,7 @@ class SearchWindow:
         # That's the reason we "store" them as instance variables
         self.artworks_table_frame = ctk.CTkFrame(self.artworks_tab)
         self.artworks_table_frame.place(relx=0.2, relwidth=0.8, relheight=1)
-        DataGrid(self.artworks_table_frame, artworks_data, artworks_headers)
+        DataGrid(self.artworks_table_frame, artworks_data, artworks_headers, 'Artworks')
         page_label = ctk.CTkLabel(self.artworks_tab, text=f"Page {self.current_page + 1}/{self.total_pages}", font=self.app.MOMA_FONT_MD)
         page_label.place(relx=0.5, rely=0.95, anchor=ctk.CENTER)
 
@@ -111,7 +111,7 @@ class SearchWindow:
         artists_tab = filters_tabs.add("Artists")
         self.artists_data = self.search('Artists', -1)
         artists_data, artists_headers, _ = self.artists_data
-        DataGrid(artists_tab, artists_data, artists_headers)
+        DataGrid(artists_tab, artists_data, artists_headers, 'Artists')
         filters_tabs.set("Artworks")
 
     def refresh_artworks_table(self):
@@ -125,7 +125,7 @@ class SearchWindow:
         self.artworks_table_frame.destroy()
         self.artworks_table_frame = ctk.CTkFrame(self.artworks_tab)
         self.artworks_table_frame.place(relx=0.2, relwidth=0.8, relheight=1)
-        DataGrid(self.artworks_table_frame, artworks_data, artworks_headers)
+        DataGrid(self.artworks_table_frame, artworks_data, artworks_headers, 'Artworks')
         page_label = ctk.CTkLabel(self.artworks_tab, text=f"Page {self.current_page + 1}/{self.total_pages}", font=self.app.MOMA_FONT_MD)
         page_label.place(relx=0.5, rely=0.95, anchor=ctk.CENTER)
 
