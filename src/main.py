@@ -14,7 +14,7 @@ class StylingOptions:
         
 
     def styles(self):
-        '''Βασικά στυλ για χρήση εντός της εφαρμογής'''
+        #Βασικά στυλ για χρήση εντός της εφαρμογής
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("dark-blue")
 
@@ -37,12 +37,11 @@ class StylingOptions:
         self.master.MOMA_BUTTON_SECONDARY = "#6c757d"
 
     def setup_bg_image(self):
-        '''Διαχειρίζεται την εικόνα στο background'''
-        try:
-            ImageInBackground(self.master, '../assets/moma_photo.jpg')
+        #Διαχειρίζεται την εικόνα στο background
+        
+        ImageInBackground(self.master, '../assets/moma_photo.jpg')
             
-        except Exception as e:
-            print("An error occurred during background image resize:", e)
+        
 
     
         
@@ -52,8 +51,10 @@ class StylingOptions:
 class ImageInBackground: 
     '''Δημιουργεί εικόνα στο background'''
     def __init__(self, master, img_name): 
-        
-        self.original_image = myImage.open(img_name)
+        try:
+            self.original_image = myImage.open(img_name)
+        except ImportError as e:
+            print("An error occurred while importing background image resize:", e)
 
         self.img_copy = self.original_image.copy() 
     
@@ -63,11 +64,13 @@ class ImageInBackground:
         self.background.bind('<Configure>', self.resize_background) 
 
     def resize_background(self, event): 
-        '''Αλλάζει το μέγεθος της εικόνας ανάλογα με το μέγεθος του παραθύρου'''
+        #Αλλάζει το μέγεθος της εικόνας ανάλογα με το μέγεθος του παραθύρου
         new_width = event.width 
         new_height = event.height 
-
-        self.resized_image = self.img_copy.resize ((new_width, new_height)) 
+        try:
+            self.resized_image = self.img_copy.resize ((new_width, new_height)) 
+        except Exception as e:
+            print("An error occurred during background image resize:", e)
 
         self.background_image = ImageTk.PhotoImage(self.resized_image) 
 
@@ -75,6 +78,7 @@ class ImageInBackground:
 
 
 class Main_page_UI:
+    '''Η κλάση που δημιουργεί και διαχειρίζεται το interface της αρχικής σελίδας, καθώς και τις διεπαφές με άλλες σελίδες'''
     def __init__(self, app):
         self.app = app
         
@@ -82,6 +86,7 @@ class Main_page_UI:
 
 
     def init_ui(self):
+        #Εδώ ουσιαστικά δημιουργείται το UI και γίνονται όλες οι λειτουργίες του γραφικού περοβάλλοντος
         StylingOptions(self.app)
         self.draw_header()
         self.draw_search_buttons()
@@ -89,7 +94,7 @@ class Main_page_UI:
         
         self.app.mainloop()
 
-
+    #Δημιουργία κεφαλίδας
     def draw_header(self):
         self.header = ctk.CTkLabel(
             self.app, 
@@ -113,7 +118,7 @@ class Main_page_UI:
                     anchor=ctk.CENTER, 
                     relwidth=1)
 
-   
+   #Δημιουργία των κουμπιών. Περιέχεται και κενό Random Artworks κουμπί ως προσχέδιο.
     def draw_search_buttons(self):
         self.search_button_frame = ctk.CTkFrame(self.app)
         self.search_button_frame.place(
@@ -149,11 +154,17 @@ class Main_page_UI:
                                         fg_color = 'black')
         self.random_button.pack(fill = ctk.BOTH, expand = 1)
 
+    #Δημιουργία του Home button
     def draw_home_button(self):
-        
-        self.home_image = myImage.open("../assets/Home_Icon.png")
-        self.resized_image = self.home_image.resize((35, 35))
-        self.home_tn = ctk.CTkImage(self.resized_image)
+        try:
+            self.home_image = myImage.open("../assets/Home_Icon.png")
+        except ImportError as e:
+            print("An error occurred while importing home image:", e)
+        try:
+            self.resized_image = self.home_image.resize((35, 35))
+            self.home_tn = ctk.CTkImage(self.resized_image)
+        except Exception as e:
+            print("An error occurred during home image resize:", e)
         
         self.home_button = ctk.CTkButton(
                                         self.app, 
@@ -167,6 +178,7 @@ class Main_page_UI:
                                         )
         self.home_button.place(rely = 0.99, relx = 0.99, anchor = 'se')
 
+    #To search button καταστρέφει τα κουμπιά της αρχικής σελίδας και ανοίγει το περιβάλλον αναζήτησης
     def search_button_click(self):
         self.search_button_frame.destroy()
         self.random_button_frame.destroy()
@@ -178,7 +190,8 @@ class Main_page_UI:
 
     def random_button_click(self):
         pass
-
+    
+    #Το home button καταστρέφει όλα τα widget και επανεκκινεί το UI.
     def home_button_click(self):
         for widget in self.app.winfo_children():
             widget.destroy()
@@ -199,4 +212,5 @@ class Main_Class:
         
 
 if __name__ == "__main__":
+    '''Κύριο πρόγραμμα'''
     Main_Class()

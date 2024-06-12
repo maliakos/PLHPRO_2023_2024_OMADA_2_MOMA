@@ -4,6 +4,7 @@ import os
 
 
 class DatabaseManager:
+    '''Δημιουργία και διαχείριση της Βάσης Δεδομένων'''
     def __init__(self):
         #Ελέγχουμε την ύπαρξη της ΒΔ, εάν υπάρχει τη δημιουργούμε
         if not os.path.exists('moma.db') or os.path.getsize('moma.db') == 0:
@@ -23,7 +24,7 @@ class DatabaseManager:
         #Δημιουργία της ΒΔ
         conn = sqlite3.connect('moma.db')
         cursor = conn.cursor()
-        self.IDs = []
+        self.IDs = [] #Χρήση λίστας για την αποθήκευση των ConstituentID του Artworks για να εισάγουμε τα αντίστοιχα του Artists
         self.create_artworks(cursor)
         self.create_artists(cursor)
 
@@ -36,7 +37,7 @@ class DatabaseManager:
         conn.close()
 
     def create_artworks(self, cursor):
-        # Δημιουργία πίνακα Artworks, ObjectID το PK
+        # Δημιουργία πίνακα Artworks
         cursor.execute('''CREATE TABLE Artworks(
                     ObjectID TEXT PRIMARY KEY NOT NULL,
                     Title TEXT,
@@ -65,7 +66,7 @@ class DatabaseManager:
                     Duration_sec FLOAT)''')
     
     def create_artists(self, cursor):
-        # Δημιουργία πίνακα Artists, PK το ConstituentID
+        # Δημιουργία πίνακα Artists
         cursor.execute('''CREATE TABLE Artists(
                     ConstituentID TEXT PRIMARY KEY NOT NULL,
                     DisplayName TEXT,
@@ -106,7 +107,7 @@ class DatabaseManager:
                     ConstituentID = ','.join(map(str, ConstituentID_list))
                 
                     for id in ConstituentID_list:
-                        self.ID_Search(id)
+                        self.ID_Search(id) #Τοποθέτηση των ID στη λίστα
 
                     
                     Date = y.get('Date', None)
@@ -145,16 +146,12 @@ class DatabaseManager:
                     print(f"Error inserting Artwork: {e}")
     
     def insert_artists(self, cursor, Artists_data):
-
-        
+    #Εισαγωγή δεδομένων στον πίνακα Artists
         for x in Artists_data:
-            #Εισαγωγή δεδομένων στον πίνακα Artists
             #Έλεγχος αν το ID υπάρχει σε κάποιο έργο στον Artworks, προκειμένου να υπάρχουν στον πίνακα μόνο καλλιτέχνες με έργα στη ΜοΜΑ
             try:
                 ConstituentID = x.get('ConstituentID', None)
-                
-                
-                if ConstituentID in self.IDs:
+                if ConstituentID in self.IDs: #Έλεγχος αν το ID περιέχεται στη λίστα
                     DisplayName = x.get('DisplayName', None)
                     ArtistBio = x.get('ArtistBio', None)
                     Nationality = x.get('Nationality', None)
@@ -173,5 +170,6 @@ class DatabaseManager:
             except sqlite3.Error as e:
                 print(f"Error inserting Artist:{e}")
 
+    #Μέθοδος για την πρόσθεση ID στη λίστα
     def ID_Search(self, ConstituentID):
         self.IDs.append(ConstituentID)
